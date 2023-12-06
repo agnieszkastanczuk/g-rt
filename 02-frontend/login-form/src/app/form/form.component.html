@@ -90,7 +90,6 @@
                 Nieprawidłowy format email
               </mat-error>
             </mat-form-field>
-
             <mat-form-field appearance="fill">
               <mat-label>Hasło</mat-label>
               <input
@@ -143,6 +142,51 @@
               Załóż konto
             </button>
           </form>
+        </mat-card-content>
+      </mat-tab>
+    </mat-tab-group>
+    <mat-tab-group mat-align-tabs="center">
+      <!-- zmiana hasła -->
+      <mat-tab label="Zresetuj hasło">
+        <mat-card-content>
+          <form
+            [formGroup]="resetPasswordForm"
+            class="flex-col"
+            (ngSubmit)="onResetPassword()"
+            *ngIf="!isResetEmailSent"
+          >
+            <mat-form-field appearance="fill">
+              <mat-label>Email</mat-label>
+              <input
+                matInput
+                placeholder="Wpisz swój email"
+                type="email"
+                formControlName="email"
+                required
+              />
+              <mat-icon
+                *ngIf="resetPasswordForm.get('email')?.errors?.['email']"
+                matSuffix
+                >error</mat-icon
+              >
+              <mat-error
+                *ngIf="resetPasswordForm.get('email')?.errors?.['email']"
+              >
+                Nieprawidłowy format email
+              </mat-error>
+            </mat-form-field>
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="!resetPasswordForm.valid"
+              type="submit"
+            >
+              Wyślij instrukcje resetowania
+            </button>
+          </form>
+          <p *ngIf="isResetEmailSent">
+            Instrukcje resetowania hasła zostały wysłane na podany adres email.
+          </p>
         </mat-card-content>
       </mat-tab>
     </mat-tab-group>

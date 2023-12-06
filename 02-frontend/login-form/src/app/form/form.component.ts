@@ -9,9 +9,9 @@ import {
   ReactiveFormsModule,
   FormGroup,
   FormControl,
-  ValidationErrors,
   Validators,
   AbstractControl,
+  ValidationErrors,
 } from '@angular/forms';
 
 @Component({
@@ -44,38 +44,35 @@ export class FormComponent {
     { validators: this.matchPasswords }
   );
 
+  resetPasswordForm = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+  });
+
+  activeTabIndex = 0;
+  isReadyToSwap: boolean = true;
+  isResetEmailSent: boolean = false;
+  isDataValid: boolean = true;
+  isLoggedIn: boolean = false;
+
   passwordValidator(control: AbstractControl): ValidationErrors | null {
-    const value = control.value as string;
+    const value = control.value;
     const hasNumber = /[0-9]/.test(value);
     const hasUpper = /[A-Z]/.test(value);
     const hasLower = /[a-z]/.test(value);
-    const valid = hasNumber && hasUpper && hasLower && value.length > 7;
-    return valid ? null : { passwordStrength: true };
+    return hasNumber && hasUpper && hasLower && value.length > 7
+      ? null
+      : { passwordStrength: true };
   }
 
   matchPasswords(group: AbstractControl): ValidationErrors | null {
     const password = group.get('password')?.value;
     const confirmPassword = group.get('confirmPassword')?.value;
-    if (!confirmPassword) {
-      return null; // lub zwróć błąd, jeśli preferujesz wymuszenie wypełnienia
-    }
     return password === confirmPassword ? null : { passwordsMismatch: true };
   }
 
-  activeTabIndex = 0;
-  isReadyToSwap: boolean = true;
-
   swapIndex() {
-    if (this.isReadyToSwap) {
-      if (this.activeTabIndex === 0) {
-        this.activeTabIndex = 1;
-      } else {
-        this.activeTabIndex = 0;
-      }
-    } else {
-      this.isReadyToSwap = true;
-    }
-    console.log(this.activeTabIndex);
+    this.isReadyToSwap = !this.isReadyToSwap;
+    this.activeTabIndex = this.activeTabIndex === 0 ? 1 : 0;
   }
 
   onRegister() {
@@ -85,28 +82,25 @@ export class FormComponent {
     }
   }
 
-  get login() {
-    return this.loginForm.get('login');
+  onResetPassword() {
+    if (this.resetPasswordForm.valid) {
+      console.log(
+        'Instrukcje resetowania hasła wysłane na: ',
+        this.resetPasswordForm.get('email')?.value
+      );
+      this.isResetEmailSent = true;
+    }
   }
-
-  isDataValid: boolean = true;
-  isLoggedIn: boolean = false;
 
   checkData() {
     const loginValue = this.loginForm.get('login')?.value;
     const passwordValue = this.loginForm.get('password')?.value;
+    this.isDataValid =
+      loginValue !== 'testError' && passwordValue !== 'abcPassword';
+    this.isLoggedIn = this.isDataValid;
+  }
 
-    if (!loginValue || !passwordValue) {
-      this.isDataValid = false;
-      return;
-    }
-
-    //Sample data validation logic
-    if (loginValue === 'testError') {
-      this.isDataValid = false;
-    } else {
-      this.isDataValid = true;
-      this.isLoggedIn = true;
-    }
+  get login() {
+    return this.loginForm.get('login');
   }
 }
