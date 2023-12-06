@@ -11,5 +11,15 @@
 .flex-col {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 40px;
+}
+
+mat-card {
+  min-width: 600px;
+  min-height: 600px;
+}
+
+mat-form-field {
+  max-width: 400px;
+  margin: auto;
 }

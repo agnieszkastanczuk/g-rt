@@ -5,7 +5,12 @@
         <img src="/assets/logo_gpsguardian.svg" alt="GPS Guardian Logo" />
       </div>
     </mat-card-header>
-    <mat-tab-group mat-align-tabs="center">
+    <mat-tab-group
+      mat-align-tabs="center"
+      [selectedIndex]="activeTabIndex"
+      (selectedTabChange)="swapIndex()"
+    >
+      <!-- zaloguj -->
       <mat-tab label="Zaloguj">
         <mat-card-content>
           <form
@@ -21,6 +26,7 @@
                 placeholder="Wpisz swój login/email"
                 type="email"
                 formControlName="login"
+                required
               />
               <mat-icon *ngIf="!isDataValid" matSuffix>close</mat-icon>
             </mat-form-field>
@@ -48,6 +54,95 @@
             <p *ngIf="!isDataValid">Błąd 401: Nieprawidłowy login lub hasło</p>
           </form>
           <p *ngIf="isLoggedIn">Zostałeś Zalogowany</p>
+        </mat-card-content>
+      </mat-tab>
+      <!-- zarejestruj -->
+      <mat-tab label="Zarejestruj">
+        <mat-card-content>
+          <form
+            [formGroup]="registerForm"
+            class="flex-col"
+            (ngSubmit)="onRegister()"
+          >
+            <mat-form-field appearance="fill">
+              <mat-label>Email</mat-label>
+              <input
+                matInput
+                placeholder="Wpisz swój email"
+                type="email"
+                formControlName="email"
+                required
+              />
+              <mat-icon
+                *ngIf="registerForm.get('email')?.errors?.['email']"
+                matSuffix
+                >error</mat-icon
+              >
+              <mat-icon
+                *ngIf="
+                  registerForm.get('email')?.valid &&
+                  registerForm.get('email')?.dirty
+                "
+                matSuffix
+                >check</mat-icon
+              >
+              <mat-error *ngIf="registerForm.get('email')?.errors?.['email']">
+                Nieprawidłowy format email
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Hasło</mat-label>
+              <input
+                matInput
+                placeholder="Wpisz swoje hasło"
+                type="password"
+                formControlName="password"
+                required
+              />
+              <mat-icon
+                *ngIf="registerForm.get('password')?.dirty && registerForm.get('password')?.errors?.['passwordStrength']"
+                matSuffix
+                >error</mat-icon
+              >
+              <mat-icon
+                *ngIf="
+                  registerForm.get('password')?.valid &&
+                  registerForm.get('password')?.dirty
+                "
+                matSuffix
+                >check</mat-icon
+              >
+              <mat-error
+                *ngIf="registerForm.get('password')?.errors?.['passwordStrength']"
+              >
+                Hasło musi zawierać cyfrę, małą i dużą literę oraz być dłuższe
+                niż 8 znaków
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+              <mat-label>Powtórz hasło</mat-label>
+              <input
+                matInput
+                placeholder="Wpisz ponownie hasło"
+                type="password"
+                formControlName="confirmPassword"
+                required
+              />
+            </mat-form-field>
+            <mat-error *ngIf="registerForm.hasError('passwordsMismatch')">
+              Hasła nie są zgodne
+            </mat-error>
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="!registerForm.valid"
+              type="submit"
+            >
+              Załóż konto
+            </button>
+          </form>
         </mat-card-content>
       </mat-tab>
     </mat-tab-group>

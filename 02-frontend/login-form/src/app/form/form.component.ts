@@ -5,8 +5,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
-import { ReactiveFormsModule } from '@angular/forms';
-import { FormGroup, FormControl } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormControl,
+  ValidationErrors,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-form',
@@ -28,6 +34,56 @@ export class FormComponent {
     login: new FormControl(''),
     password: new FormControl(''),
   });
+
+  registerForm = new FormGroup(
+    {
+      email: new FormControl('', [Validators.email]),
+      password: new FormControl('', [this.passwordValidator]),
+      confirmPassword: new FormControl(''),
+    },
+    { validators: this.matchPasswords }
+  );
+
+  passwordValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value as string;
+    const hasNumber = /[0-9]/.test(value);
+    const hasUpper = /[A-Z]/.test(value);
+    const hasLower = /[a-z]/.test(value);
+    const valid = hasNumber && hasUpper && hasLower && value.length > 7;
+    return valid ? null : { passwordStrength: true };
+  }
+
+  matchPasswords(group: AbstractControl): ValidationErrors | null {
+    const password = group.get('password')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    if (!confirmPassword) {
+      return null; // lub zwróć błąd, jeśli preferujesz wymuszenie wypełnienia
+    }
+    return password === confirmPassword ? null : { passwordsMismatch: true };
+  }
+
+  activeTabIndex = 0;
+  isReadyToSwap: boolean = true;
+
+  swapIndex() {
+    if (this.isReadyToSwap) {
+      if (this.activeTabIndex === 0) {
+        this.activeTabIndex = 1;
+      } else {
+        this.activeTabIndex = 0;
+      }
+    } else {
+      this.isReadyToSwap = true;
+    }
+    console.log(this.activeTabIndex);
+  }
+
+  onRegister() {
+    if (this.registerForm.valid) {
+      this.isReadyToSwap = false;
+      this.activeTabIndex = 0;
+    }
+  }
 
   get login() {
     return this.loginForm.get('login');
