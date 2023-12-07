@@ -85,19 +85,21 @@ service / on new http:Listener(port) {
     }
 
     // POST /auth/login - we provide email and password in the body request. If the combination matches a user from the list, we return the response code Ok (200). In case of invalid combination, we return the response code Unauthorized (401)
-    resource function post auth/login(@http:Payload LoginData loginData, http:Caller caller) {
-        foreach var user in users {
-            if (user.email == loginData.email && user.password == loginData.password) {
-                http:Response res = new;
-                res.statusCode = 200; // Ok
-                res.setPayload("Login successful.");
-                checkpanic caller->respond(res);
-                return;
-            }
+  resource function post auth/login(@http:Payload LoginData loginData, http:Caller caller) {
+    foreach var user in users {
+        if (user.email == loginData.email && user.password == loginData.password) {
+            http:Response res = new;
+            res.statusCode = 200; // Ok
+            json payload = {message: "Login successful"};
+            res.setPayload(payload);
+            checkpanic caller->respond(res);
+            return;
         }
-        http:Response res = new;
-        res.statusCode = 401; // Unauthorized
-        res.setPayload("Invalid email or password.");
-        checkpanic caller->respond(res);
     }
+    http:Response res = new;
+    res.statusCode = 401; // Unauthorized
+    json payload = {message: "Invalid email or password"};
+    res.setPayload(payload);
+    checkpanic caller->respond(res);
+}
 }

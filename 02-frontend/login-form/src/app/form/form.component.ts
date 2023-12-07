@@ -13,6 +13,7 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-form',
@@ -100,12 +101,27 @@ export class FormComponent {
     }
   }
 
+  constructor(private authService: AuthService) {}
+
   checkData() {
-    const loginValue = this.loginForm.get('login')?.value;
-    const passwordValue = this.loginForm.get('password')?.value;
-    this.isDataValid =
-      loginValue !== 'testError' && passwordValue !== 'abcPassword';
-    this.isLoggedIn = this.isDataValid;
+    const emailValue = this.loginForm.get('login')?.value || '';
+    const passwordValue = this.loginForm.get('password')?.value || '';
+
+    if (emailValue && passwordValue) {
+      this.authService.login(emailValue, passwordValue).subscribe({
+        next: (response) => {
+          console.log('Login successful', response);
+          this.isLoggedIn = true;
+        },
+        error: (error) => {
+          console.log('Login failed', error);
+          this.isDataValid = false;
+          this.isLoggedIn = false;
+        },
+      });
+    } else {
+      console.log('Email and/or password cannot be empty');
+    }
   }
 
   get login() {
