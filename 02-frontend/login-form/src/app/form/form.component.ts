@@ -72,8 +72,15 @@ export class FormComponent {
   }
 
   swapIndex() {
-    this.isReadyToSwap = !this.isReadyToSwap;
-    this.activeTabIndex = this.activeTabIndex === 0 ? 1 : 0;
+    if (this.isReadyToSwap) {
+      if (this.activeTabIndex === 0) {
+        this.activeTabIndex = 1;
+      } else {
+        this.activeTabIndex = 0;
+      }
+    } else {
+      this.isReadyToSwap = true;
+    }
   }
 
   onRegister() {
