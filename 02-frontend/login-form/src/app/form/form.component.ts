@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -26,6 +27,7 @@ import { AuthService } from '../services/auth.service';
     MatTabsModule,
     MatIconModule,
     ReactiveFormsModule,
+    MatProgressBarModule,
   ],
   templateUrl: './form.component.html',
   styleUrl: './form.component.css',
@@ -64,6 +66,28 @@ export class FormComponent {
     return hasNumber && hasUpper && hasLower && value.length > 7
       ? null
       : { passwordStrength: true };
+  }
+
+  passwordStrength = 0;
+
+  calculatePasswordStrength(): void {
+    const password = this.registerForm.get('password')?.value || '';
+    let strength = 0;
+
+    if (password.length > 8) {
+      strength += 25;
+    }
+    if (password.match(/[A-Z]/)) {
+      strength += 25;
+    }
+    if (password.match(/[0-9]/)) {
+      strength += 25;
+    }
+    if (password.match(/[$@#&!]/)) {
+      strength += 25;
+    }
+
+    this.passwordStrength = strength;
   }
 
   matchPasswords(group: AbstractControl): ValidationErrors | null {

@@ -103,6 +103,7 @@
                 placeholder="Wpisz swoje hasło"
                 type="password"
                 formControlName="password"
+                (keyup)="calculatePasswordStrength()"
                 required
               />
               <mat-icon
@@ -125,7 +126,12 @@
                 niż 8 znaków
               </mat-error>
             </mat-form-field>
-
+            <mat-progress-bar
+              *ngIf="registerForm.get('password')?.value"
+              mode="determinate"
+              [value]="passwordStrength"
+            >
+            </mat-progress-bar>
             <mat-form-field appearance="fill">
               <mat-label>Powtórz hasło</mat-label>
               <input
