@@ -53,6 +53,7 @@ export class FormComponent {
   isResetEmailSent: boolean = false;
   isDataValid: boolean = true;
   isLoggedIn: boolean = false;
+  showResetPasswordForm: boolean = false;
 
   passwordValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
@@ -102,5 +103,9 @@ export class FormComponent {
 
   get login() {
     return this.loginForm.get('login');
+  }
+
+  toggleResetPasswordForm() {
+    this.showResetPasswordForm = !this.showResetPasswordForm;
   }
 }

@@ -41,7 +41,13 @@
               />
             </mat-form-field>
             <mat-card-actions>
-              <button mat-button>Zresetuj hasło</button>
+              <button
+                mat-button
+                (click)="toggleResetPasswordForm()"
+                type="button"
+              >
+                Zresetuj hasło
+              </button>
             </mat-card-actions>
             <button
               mat-raised-button
@@ -145,7 +151,7 @@
         </mat-card-content>
       </mat-tab>
     </mat-tab-group>
-    <mat-tab-group mat-align-tabs="center">
+    <mat-tab-group mat-align-tabs="center" *ngIf="showResetPasswordForm">
       <!-- zmiana hasła -->
       <mat-tab label="Zresetuj hasło">
         <mat-card-content>
