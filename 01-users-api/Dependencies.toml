@@ -12,6 +12,7 @@ org = "aga"
 name = "users"
 version = "0.1.0"
 dependencies = [
+	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "http"},
 	{org = "ballerinai", name = "observe"}
 ]
@@ -53,10 +54,13 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "crypto"
-version = "2.5.0"
+version = "2.6.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
+]
+modules = [
+	{org = "ballerina", packageName = "crypto", moduleName = "crypto"}
 ]
 
 [[package]]

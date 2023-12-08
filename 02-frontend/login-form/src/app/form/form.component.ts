@@ -110,6 +110,18 @@ export class FormComponent {
 
   onRegister() {
     if (this.registerForm.valid) {
+      const email = this.registerForm.get('email')?.value || '';
+      const password = this.registerForm.get('password')?.value || '';
+
+      this.authService.register(email, password).subscribe({
+        next: (response) => {
+          console.log('Registration successful', response);
+        },
+        error: (error) => {
+          console.log('Registration failed', error);
+        },
+      });
+
       this.isReadyToSwap = false;
       this.activeTabIndex = 0;
     }

@@ -1,5 +1,6 @@
 
 import ballerina/http;
+import ballerina/crypto;
 
 configurable int port = 8080;
 
@@ -18,6 +19,12 @@ public type LoginData record {
     string password;
 };
 
+function encryptPassword(string password) returns string {
+        byte[] passwordBytes = password.toBytes();
+        byte[] hashedPassword = crypto:hashSha256(passwordBytes);
+        return hashedPassword.toBase64();
+}
+
 table<User> key(id) users = table [
        {id: 1, email: "user1@gmail.com", password: "password1"},
         {id: 2, email: "user2@gmail.com", password: "password2"},
@@ -26,7 +33,8 @@ table<User> key(id) users = table [
 
 @http:ServiceConfig {
     cors: {
-        allowOrigins: ["*"]
+        allowOrigins: ["http://localhost:4200"], 
+        allowHeaders: ["*"]
     }
 }
 
@@ -49,21 +57,29 @@ service / on new http:Listener(port) {
 
    // POST /users - the request body should contain a new User object that will be added to the list of users
     resource function post users(@http:Payload User newUser, http:Caller caller) {
-    foreach var user in users {
-        if (user.id == newUser.id) {
-            http:Response res = new;
-            res.statusCode = 400; // Bad Request
-            res.setPayload("User with the same id already exists.");
-            checkpanic caller->respond(res);
-            return;
+        // Check for existing user with the same email
+        foreach var user in users {
+            if (user.email == newUser.email) {
+                http:Response res = new;
+                res.statusCode = 409; // Conflict
+                res.setPayload("User with the same email already exists.");
+                checkpanic caller->respond(res);
+                return;
+            }
         }
-    }
-    users.add(newUser);
-    http:Response res = new;
-    res.statusCode = 201; // Created
-    json payload = newUser.toJson(); 
-    res.setPayload(payload);
-    checkpanic caller->respond(res);
+
+        // Encrypt the newUser password
+        newUser.password = encryptPassword(newUser.password);
+
+        // Add newUser to the users table
+        users.add(newUser);
+
+        // Create and send success response
+        http:Response res = new;
+        res.statusCode = 201; // Created
+        json payload = newUser.toJson();
+        res.setPayload(payload);
+        checkpanic caller->respond(res);
     }
 
     // POST /users/resetPassword - in the body request we pass the email of the user for whom we want to reset the password. If the user with the given email address is on the list, we return the response code Accepted (202). If the user is not on the list, we return the Bad Request code (400).
